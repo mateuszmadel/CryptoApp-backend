@@ -1,0 +1,41 @@
+const bcrypt =require('bcryptjs');
+const jwt = require('jsonwebtoken');
+class UserService {
+    constructor(userModel) {
+        this.userModel = userModel;
+    }
+
+    async register(userInput) {
+        try {
+            const salt = await bcrypt.genSalt();
+            const userRecord = await this.userModel.create({
+                ...userInput,
+                password: await bcrypt.hash(userInput.password, salt)
+            });
+
+            if (!userRecord) {
+                throw new Error('User cannot be created');
+            }
+            const user = userRecord.toObject();
+            return user;
+        } catch (e) {
+            throw e;
+        }
+
+    }
+
+    async login(userInput) {
+        const userRecord = await this.userModel.findOne({ username:userInput.username });
+        if (!userRecord) {
+            throw new Error('User not registered');
+        }
+        const validPass= await bcrypt.compare(userInput.password,userRecord.password);
+        if (!validPass) {
+            throw new Error('Wrong password');
+        }
+        const token = jwt.sign({username:userRecord.username},process.env.JWT_SECRET);
+        return token
+
+    }
+}
+module.exports = UserService;
