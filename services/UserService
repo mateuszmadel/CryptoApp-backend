@@ -27,11 +27,11 @@ class UserService {
     async login(userInput) {
         const userRecord = await this.userModel.findOne({ username:userInput.username });
         if (!userRecord) {
-            throw new Error('User not registered');
+            throw new Error('Użytkownik nie istnieje.');
         }
         const validPass= await bcrypt.compare(userInput.password,userRecord.password);
         if (!validPass) {
-            throw new Error('Wrong password');
+            throw new Error('Wprowadzone hasło jest nieprawidłowe ');
         }
         const token = jwt.sign({username:userRecord.username},process.env.JWT_SECRET);
         return token
