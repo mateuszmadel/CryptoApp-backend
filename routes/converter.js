@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const tokenAuth = require('../middlewares/tokenAuth')
 const coinsData = require('../middlewares/coinsData')
+const tokenAuth = require('../middlewares/tokenAuth')
 const CurrencyConverterService=require('../services/CurrencyConverterService')
 
 let data;
@@ -12,10 +12,13 @@ getData(async function(){
     data=await coinsData();
     console.log("updated")
 },60000)
-
-router.get('/',tokenAuth, async (req,res)=>{
+router.get('/list',tokenAuth, async (req,res)=>{
     let obj=new CurrencyConverterService(data)
-    res.send(obj.convert(req.query.from,req.query.to,req.query.amount))
+    res.json(obj.listOfCurrencies())
+})
+router.post('/convert',tokenAuth,async (req,res)=>{
+    let obj=new CurrencyConverterService(data)
+    res.json(obj.convert(req.body.from,req.body.to,req.body.amount))
 })
 
 module.exports= router;
