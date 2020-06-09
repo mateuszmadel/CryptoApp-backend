@@ -23,11 +23,15 @@ class PurchasesService {
             let currentPrice=data.find(el => el.id === entry.coinId).quotes[entry.currency].price
             let percent=currentPrice/entry.price*100 - 100;
             let profit=(currentPrice-entry.price)*entry.amount
+            let name=data.find(el => el.id === entry.coinId).name
             this[index]={
                 ...this[index]._doc,
+                name,
                 currentPrice,
                 percent,
-                profit
+                profit,
+
+
             }
         },list)
 
