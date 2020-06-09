@@ -37,6 +37,24 @@ class PurchasesService {
 
         return list
     }
+    async edit(user,id,userInput) {
+        const record = await this.purchaseModel.findOne({_id:id,user});
+        if (!record) {
+            throw new Error('Access denied');
+        }
+
+        const updated = await this.purchaseModel.updateOne({_id:id},{...userInput})
+        return updated.nModified
+    }
+    async delete(user,id) {
+        const record = await this.purchaseModel.findOne({_id:id,user});
+        if (!record) {
+            throw new Error('Access denied');
+        }
+
+        const deleted = await this.purchaseModel.deleteOne({_id:id})
+        return deleted.deletedCount
+    }
 }
 
 module.exports = PurchasesService;
