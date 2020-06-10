@@ -3,12 +3,7 @@ class CurrencyConverterService {
     constructor(data) {
         this.data = data;
     }
-    listOfCurrencies(){
-        let list=this.data.filter((item) => item.rank <= 100).sort((a, b) => a.rank < b.rank ? -1 : 1)
-        list=list.map(({id, name}) => ({id, name}))
-        list.unshift({id:'USD', name:'Dolar amerykański' },{id:'PLN',name:'Polski złoty'},{id:'EUR',name:'Euro'},{id:'GBP',name:'Funt brytyjski'})
-        return list;
-    }
+
     convert(from,to,amount) {
         //curr
         if(this.data.find(el => el.id === from)===undefined &&this.data.find(el => el.id === to)===undefined){

@@ -15,6 +15,7 @@ mongoose.connect(
 const authRoute = require('./routes/auth')
 const converterRoute = require('./routes/converter')
 const purchasesRoute = require('./routes/purchases')
+const listRoute = require('./routes/list')
 app.use(express.json())
 app.use(cors())
 app.use(cors({exposedHeaders:'auth-token'}));
@@ -24,6 +25,7 @@ app.options('*', cors())
 app.use('/api/user',authRoute);
 app.use('/api/converter',converterRoute)
 app.use('/api/purchases',purchasesRoute)
+app.use('/api/list',listRoute)
 
 app.listen(3000,()=>{
   console.log('server running');
