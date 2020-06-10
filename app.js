@@ -16,6 +16,7 @@ const authRoute = require('./routes/auth')
 const converterRoute = require('./routes/converter')
 const purchasesRoute = require('./routes/purchases')
 const listRoute = require('./routes/list')
+const notificationsRoute=require('./routes/notifications')
 app.use(express.json())
 app.use(cors())
 app.use(cors({exposedHeaders:'auth-token'}));
@@ -26,13 +27,13 @@ app.use('/api/user',authRoute);
 app.use('/api/converter',converterRoute)
 app.use('/api/purchases',purchasesRoute)
 app.use('/api/list',listRoute)
+app.use('/api/notifications',notificationsRoute)
 
 app.listen(3000,()=>{
   console.log('server running');
 })
 
 //updating prices every 60s
-
 function getData( fn, delay ) {
   fn();
   setInterval( fn, delay );
