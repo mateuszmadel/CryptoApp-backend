@@ -9,7 +9,7 @@ dotenv.config();
 mongoose.set('useUnifiedTopology', true);
 mongoose.connect(
     process.env.DB_URL,
-    { useNewUrlParser: true },
+    { useNewUrlParser: true,useCreateIndex: true },
     ()=> console.log('connected to db'))
 // import routes
 const authRoute = require('./routes/auth')
@@ -17,6 +17,7 @@ const converterRoute = require('./routes/converter')
 const purchasesRoute = require('./routes/purchases')
 const listRoute = require('./routes/list')
 const notificationsRoute=require('./routes/notifications')
+
 app.use(express.json())
 app.use(cors())
 app.use(cors({exposedHeaders:'auth-token'}));
@@ -29,7 +30,7 @@ app.use('/api/purchases',purchasesRoute)
 app.use('/api/list',listRoute)
 app.use('/api/notifications',notificationsRoute)
 
-app.listen(3000,()=>{
+app.listen(8080,()=>{
   console.log('server running');
 })
 

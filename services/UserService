@@ -2,6 +2,7 @@ const bcrypt =require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const fs=require('fs')
 class UserService {
     constructor(userModel) {
         this.userModel = userModel;
@@ -73,9 +74,23 @@ class UserService {
         };
         let info = await transporter.sendMail(mailOptions)
         console.log(info)
-
-
-
+    }
+    async checkRecoveryToken(token){
+        const record = await this.userModel.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } })
+        if(!record){
+            throw new Error('Token resetu hasła jest niepoprawny lub stracił ważność');
+        }
+        return fs.createReadStream("./views/reset.html")
+    }
+    async resetPassword(token,userInput){
+        const record = await this.userModel.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } })
+        if(!record){
+            throw new Error('Token resetu hasła jest niepoprawny lub stracił ważność');
+        }
+        console.log(userInput)
+        const salt = await bcrypt.genSalt();
+        await this.userModel.updateOne({resetPasswordToken: token},{password:await bcrypt.hash(userInput.password, salt),resetPasswordToken: undefined, resetPasswordExpires: undefined})
+        return 'Hasło zostało zmienione'
     }
 }
 module.exports = UserService;

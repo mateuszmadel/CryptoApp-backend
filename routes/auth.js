@@ -39,6 +39,20 @@ router.post('/forgotpassword', async (req, res)=> {
         res.status(400).send(e.message);
     }
 });
-
+router.get('/reset/:token', async (req, res)=> {
+    try {
+        let readStream=await userServiceInstance.checkRecoveryToken(req.params.token)
+        readStream.pipe(res)
+    } catch (e) {
+        res.status(400).send(e.message);
+    }
+});
+router.post('/reset/:token', async (req, res)=> {
+    try {
+        res.json(await userServiceInstance.resetPassword(req.params.token,req.body))
+    } catch (e) {
+        res.status(400).send(e.message);
+    }
+});
 
 module.exports = router;
