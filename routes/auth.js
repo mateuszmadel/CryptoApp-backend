@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const tokenAuth = require('../middlewares/tokenAuth')
 const UserService =require('../services/UserService');
 const User =require('../models/User');
 const userServiceInstance = new UserService(User);
@@ -18,6 +19,22 @@ router.post('/login', async (req, res)=> {
     try {
         const token=await userServiceInstance.login(req.body)
         res.header('auth-token',token).send(token);
+    } catch (e) {
+        res.status(400).send(e.message);
+    }
+});
+router.put('/settings',tokenAuth, async (req, res)=> {
+    try {
+        await userServiceInstance.changeCredentials(req.body,req.user.username)
+        res.status(201).send('Dane zostały zaktualizowane')
+    } catch (e) {
+        res.status(400).send(e.message);
+    }
+});
+router.post('/forgotpassword', async (req, res)=> {
+    try {
+        await userServiceInstance.passwordRecovery(req.body,req.headers.host)
+        res.status(201).send('ss')
     } catch (e) {
         res.status(400).send(e.message);
     }

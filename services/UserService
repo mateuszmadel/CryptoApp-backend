@@ -1,12 +1,14 @@
 const bcrypt =require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 class UserService {
     constructor(userModel) {
         this.userModel = userModel;
+
     }
 
     async register(userInput) {
-        try {
             const salt = await bcrypt.genSalt();
             const userRecord = await this.userModel.create({
                 ...userInput,
@@ -14,13 +16,10 @@ class UserService {
             });
 
             if (!userRecord) {
-                throw new Error('User cannot be created');
+                throw new Error('Użytkownik nie został utworzony');
             }
-            const user = userRecord.toObject();
-            return user;
-        } catch (e) {
-            throw e;
-        }
+            return userRecord.toObject();
+
 
     }
 
@@ -33,8 +32,49 @@ class UserService {
         if (!validPass) {
             throw new Error('Wprowadzone hasło jest nieprawidłowe ');
         }
-        const token = jwt.sign({username:userRecord.username},process.env.JWT_SECRET);
-        return token
+        return jwt.sign({username:userRecord.username},process.env.JWT_SECRET);
+
+
+    }
+
+    async changeCredentials(userInput,user) {
+        const userRecord = await this.userModel.findOne({ username:user })
+        const validPass= await bcrypt.compare(userInput.password,userRecord.password);
+        if (!validPass) {
+            throw new Error('Wprowadzone hasło jest nieprawidłowe ');
+        }
+        const salt = await bcrypt.genSalt();
+        if("newPassword" in userInput)
+             await this.userModel.updateOne({ username:user },{password: await bcrypt.hash(userInput.newPassword, salt)})
+        else if("newEmail" in userInput)
+            await this.userModel.updateOne({ username:user },{email:userInput.newEmail})
+    }
+    async passwordRecovery(userInput,host){
+        const buf = await crypto.randomBytes(20).toString('hex');
+        const validEmail= await this.userModel.findOne({ email:userInput.email })
+        if (!validEmail) {
+            throw new Error('Wprowadzony email jest niepoprawny ');
+        }
+        await this.userModel.updateOne({email:userInput.email},{ $set: {resetPasswordToken: buf, resetPasswordExpires: Date.now() + 3600000 }})
+        let transporter = nodemailer.createTransport({
+            service:'gmail',
+            auth:{
+                user:process.env.EMAIL,
+                pass:process.env.PASS
+            }
+        });
+        const mailOptions = {
+            to: validEmail.email,
+            from: 'cryptoapp@example.com',
+            subject: 'Reset hasła',
+            text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+                'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+                'http://' + host + '/api/user/reset/' + buf+ '\n\n'
+        };
+        let info = await transporter.sendMail(mailOptions)
+        console.log(info)
+
+
 
     }
 }
