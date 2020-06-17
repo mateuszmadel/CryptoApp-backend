@@ -50,6 +50,7 @@ class UserService {
         else if("newEmail" in userInput)
             await this.userModel.updateOne({ username:user },{email:userInput.newEmail})
     }
+    //send mail with generated token
     async passwordRecovery(userInput,host){
         const buf = await crypto.randomBytes(20).toString('hex');
         const validEmail= await this.userModel.findOne({ email:userInput.email })
@@ -68,13 +69,14 @@ class UserService {
             to: validEmail.email,
             from: 'cryptoapp@example.com',
             subject: 'Reset hasła',
-            text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
-                'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+            text: 'Otrzymałeś tego maila ponieważ (lub ktoś inny) zażądał resetu hasła dla twojego konta.\n\n' +
+                'Aby dokończyć proces kliknij w poniższy link:\n\n' +
                 'http://' + host + '/api/user/reset/' + buf+ '\n\n'
         };
         let info = await transporter.sendMail(mailOptions)
         console.log(info)
     }
+    //
     async checkRecoveryToken(token){
         const record = await this.userModel.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } })
         if(!record){

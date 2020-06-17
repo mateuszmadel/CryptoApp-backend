@@ -34,7 +34,7 @@ router.put('/settings',tokenAuth, async (req, res)=> {
 router.post('/forgotpassword', async (req, res)=> {
     try {
         await userServiceInstance.passwordRecovery(req.body,req.headers.host)
-        res.status(201).send('ss')
+        res.status(201).send('Email został wysłany')
     } catch (e) {
         res.status(400).send(e.message);
     }
