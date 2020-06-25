@@ -2,10 +2,10 @@ class NotificationsService {
     constructor(notificationModel,purchaseModel) {
         this.notificationModel = notificationModel;
         this.purchaseModel = purchaseModel;
-        this.sseHeader = {'Connection': 'keep-alive',
+       /* this.sseHeader = {'Connection': 'keep-alive',
             'Content-Type': 'text/event-stream',
             'Cache-Control': 'no-cache',
-            'X-Accel-Buffering': 'no'}
+            'X-Accel-Buffering': 'no'}*/
     };
 
 
@@ -24,7 +24,7 @@ class NotificationsService {
         }
         return record
     }
-    async check(user){
+    /*async check(user){
         let nData=[];
         const userNotifications= await this.notificationModel.find({user});
 
@@ -39,7 +39,7 @@ class NotificationsService {
         return nData
 
 
-    }
+    }*/
 
 }
 
