@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const fs=require('fs')
+
+
 class UserService {
     constructor(userModel) {
         this.userModel = userModel;
@@ -11,6 +13,11 @@ class UserService {
 
     async register(userInput) {
             const salt = await bcrypt.genSalt();
+
+            if(await this.userModel.findOne({ username:userInput.username }))
+                throw new Error('Ta nazwa użytkownika jest już zajęta')
+            if(await this.userModel.findOne({ email:userInput.email}))
+                throw new Error('Ten adres email jest już zajęty')
             const userRecord = await this.userModel.create({
                 ...userInput,
                 password: await bcrypt.hash(userInput.password, salt)
@@ -33,6 +40,7 @@ class UserService {
         if (!validPass) {
             throw new Error('Wprowadzone hasło jest nieprawidłowe ');
         }
+        //return jwt token if password and login match
         return jwt.sign({username:userRecord.username},process.env.JWT_SECRET);
 
 
@@ -45,19 +53,26 @@ class UserService {
             throw new Error('Wprowadzone hasło jest nieprawidłowe ');
         }
         const salt = await bcrypt.genSalt();
+
+        //checking if password or email change was requested
         if("newPassword" in userInput)
              await this.userModel.updateOne({ username:user },{password: await bcrypt.hash(userInput.newPassword, salt)})
         else if("newEmail" in userInput)
             await this.userModel.updateOne({ username:user },{email:userInput.newEmail})
     }
-    //send mail with generated token
+
     async passwordRecovery(userInput,host){
+        //generate password reset token
         const buf = await crypto.randomBytes(20).toString('hex');
+
         const validEmail= await this.userModel.findOne({ email:userInput.email })
         if (!validEmail) {
             throw new Error('Wprowadzony email jest niepoprawny ');
         }
+        //save generated token to db
         await this.userModel.updateOne({email:userInput.email},{ $set: {resetPasswordToken: buf, resetPasswordExpires: Date.now() + 3600000 }})
+
+        //send mail with generated token
         let transporter = nodemailer.createTransport({
             service:'gmail',
             auth:{
@@ -69,21 +84,23 @@ class UserService {
             to: validEmail.email,
             from: 'cryptoapp@example.com',
             subject: 'Reset hasła',
-            text: 'Otrzymałeś tego maila ponieważ (lub ktoś inny) zażądał resetu hasła dla twojego konta.\n\n' +
+            text: 'Otrzymałeś tego maila ponieważ ty (lub ktoś inny) zażądał resetu hasła dla twojego konta.\n\n' +
                 'Aby dokończyć proces kliknij w poniższy link:\n\n' +
                 'http://' + host + '/api/user/reset/' + buf+ '\n\n'
         };
         let info = await transporter.sendMail(mailOptions)
         console.log(info)
     }
-    //
+
     async checkRecoveryToken(token){
+        //check if token from url parameter is valid and return password reset page
         const record = await this.userModel.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } })
         if(!record){
             throw new Error('Token resetu hasła jest niepoprawny lub stracił ważność');
         }
         return fs.createReadStream("./views/reset.html")
     }
+
     async resetPassword(token,userInput){
         const record = await this.userModel.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } })
         if(!record){

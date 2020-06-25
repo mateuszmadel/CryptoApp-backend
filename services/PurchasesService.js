@@ -2,6 +2,7 @@ class PurchasesService {
     constructor(purchaseModel) {
         this.purchaseModel = purchaseModel;
     }
+
     async add(userInput,user) {
             const record = await this.purchaseModel.create({
                 user:user.username,
@@ -13,6 +14,7 @@ class PurchasesService {
             }
             return record.toObject();
     }
+
     async getAll(user,data){
         const list = await this.purchaseModel.find({user:user.username});
         if (!list) {
@@ -40,7 +42,7 @@ class PurchasesService {
     async edit(user,id,userInput) {
         const record = await this.purchaseModel.findOne({_id:id,user});
         if (!record) {
-            throw new Error('Access denied');
+            throw new Error('Odmowa dostępu');
         }
 
         const updated = await this.purchaseModel.updateOne({_id:id},{...userInput})
@@ -49,7 +51,7 @@ class PurchasesService {
     async delete(user,id) {
         const record = await this.purchaseModel.findOne({_id:id,user});
         if (!record) {
-            throw new Error('Access denied');
+            throw new Error('Odmowa dostępu');
         }
 
         const deleted = await this.purchaseModel.deleteOne({_id:id})

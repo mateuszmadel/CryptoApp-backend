@@ -20,7 +20,7 @@ class NotificationsService {
             status:userInput.status
         });
         if (!record) {
-            throw new Error('Invalid data');
+            throw new Error('Niepoprawne dane');
         }
         return record
     }
