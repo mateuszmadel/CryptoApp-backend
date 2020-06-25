@@ -2,10 +2,6 @@ class NotificationsService {
     constructor(notificationModel,purchaseModel) {
         this.notificationModel = notificationModel;
         this.purchaseModel = purchaseModel;
-       /* this.sseHeader = {'Connection': 'keep-alive',
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            'X-Accel-Buffering': 'no'}*/
     };
 
 
@@ -24,22 +20,7 @@ class NotificationsService {
         }
         return record
     }
-    /*async check(user){
-        let nData=[];
-        const userNotifications= await this.notificationModel.find({user});
 
-        userNotifications.forEach(async function(entry) {
-            let currPrice=data.find(el => el.id === entry.coinId).quotes[entry.currency].price
-            if((entry.status===1 && currPrice>entry.value) ||(entry.status===0 && currPrice<entry.value)) {
-                nData.push({...entry._doc,name:data.find(el => el.id === entry.coinId).name,currentPrice:currPrice})
-                await this.deleteOne({_id:entry._doc._id})
-            }
-        },this.notificationModel)
-
-        return nData
-
-
-    }*/
 
 }
 

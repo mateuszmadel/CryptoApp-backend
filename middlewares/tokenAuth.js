@@ -7,7 +7,7 @@ module.exports=function(req,res,next){
     else
         token = req.header('auth-token');
     if(!token){
-        return res.status(400).send('Access denied')
+        return res.status(400).send('Odmowa dostępu')
     }
     try {
         const verify = jwt.verify(token, process.env.JWT_SECRET);

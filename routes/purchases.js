@@ -15,7 +15,7 @@ router.post('/',tokenAuth,async (req,res)=>{
 router.get('/',tokenAuth,async (req,res)=>{
     try {
         const item  = await PurchasesServiceInstance.getAll(req.user,data);
-        res.status(201).json(item);
+        res.status(200).json(item);
     } catch (e) {
         res.status(400).send(e.message);
     }
@@ -23,7 +23,7 @@ router.get('/',tokenAuth,async (req,res)=>{
 router.put('/:id',tokenAuth,async(req,res)=>{
     try {
         const item  = await PurchasesServiceInstance.edit(req.user.username,req.params.id,req.body);
-        res.status(201).json(item);
+        res.status(201).send(item);
     } catch (e) {
         res.status(400).send(e.message);
     }
@@ -31,7 +31,7 @@ router.put('/:id',tokenAuth,async(req,res)=>{
 router.delete('/:id',tokenAuth,async(req,res)=>{
     try {
         const item  = await PurchasesServiceInstance.delete(req.user.username,req.params.id);
-        res.status(201).json(item);
+        res.status(200).send(item);
     } catch (e) {
         res.status(400).send(e.message);
     }

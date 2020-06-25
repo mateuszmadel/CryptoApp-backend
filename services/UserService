@@ -13,7 +13,8 @@ class UserService {
 
     async register(userInput) {
             const salt = await bcrypt.genSalt();
-
+            if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(userInput.email)))
+                throw new Error('Niepoprawny email')
             if(await this.userModel.findOne({ username:userInput.username }))
                 throw new Error('Ta nazwa użytkownika jest już zajęta')
             if(await this.userModel.findOne({ email:userInput.email}))
@@ -58,6 +59,8 @@ class UserService {
         if("newPassword" in userInput)
              await this.userModel.updateOne({ username:user },{password: await bcrypt.hash(userInput.newPassword, salt)})
         else if("newEmail" in userInput)
+            if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(userInput.newEmail)))
+                throw new Error('Niepoprawny email')
             await this.userModel.updateOne({ username:user },{email:userInput.newEmail})
     }
 

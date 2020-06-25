@@ -10,7 +10,7 @@ class PurchasesService {
 
             });
             if (!record) {
-                throw new Error('err');
+                throw new Error('Niepoprawne dane');
             }
             return record.toObject();
     }
@@ -18,7 +18,7 @@ class PurchasesService {
     async getAll(user,data){
         const list = await this.purchaseModel.find({user:user.username});
         if (!list) {
-            throw new Error('err');
+            throw new Error('Błąd odczytu');
         }
 
         list.forEach(function(entry,index) {
@@ -45,8 +45,8 @@ class PurchasesService {
             throw new Error('Odmowa dostępu');
         }
 
-        const updated = await this.purchaseModel.updateOne({_id:id},{...userInput})
-        return updated.nModified
+        await this.purchaseModel.updateOne({_id:id},{...userInput})
+        return 'Wpis został zmodyfikowany'
     }
     async delete(user,id) {
         const record = await this.purchaseModel.findOne({_id:id,user});
@@ -54,8 +54,8 @@ class PurchasesService {
             throw new Error('Odmowa dostępu');
         }
 
-        const deleted = await this.purchaseModel.deleteOne({_id:id})
-        return deleted.deletedCount
+        await this.purchaseModel.deleteOne({_id:id})
+        return 'Wpis został usunięty'
     }
 }
 
