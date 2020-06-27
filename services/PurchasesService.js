@@ -4,15 +4,17 @@ class PurchasesService {
     }
 
     async add(userInput,user) {
-            const record = await this.purchaseModel.create({
-                user:user.username,
-                ...userInput
+        if(userInput.price <=0 || userInput.amount <=0)
+            throw new Error('Niepoprawne dane')
+        const record = await this.purchaseModel.create({
+            user:user.username,
+            ...userInput
 
             });
-            if (!record) {
-                throw new Error('Niepoprawne dane');
-            }
-            return record.toObject();
+        if (!record) {
+            throw new Error('Niepoprawne dane');
+        }
+        return record.toObject();
     }
 
     async getAll(user,data){
