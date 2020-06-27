@@ -18,7 +18,7 @@ router.post('/register', async (req, res)=>{
 router.post('/login', async (req, res)=> {
     try {
         const token=await userServiceInstance.login(req.body)
-        res.header('auth-token',token).send(token);
+        res.header('auth-token',token).send();
     } catch (e) {
         res.status(400).send(e.message);
     }

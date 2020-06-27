@@ -42,6 +42,8 @@ class PurchasesService {
         return list
     }
     async edit(user,id,userInput) {
+        if(userInput.price <=0 || userInput.amount <=0)
+            throw new Error('Niepoprawne dane')
         const record = await this.purchaseModel.findOne({_id:id,user});
         if (!record) {
             throw new Error('Odmowa dostępu');
