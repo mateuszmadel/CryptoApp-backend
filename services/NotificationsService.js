@@ -7,7 +7,8 @@ class NotificationsService {
 
     async add(user,userInput){
         const purchaseRecord=await this.purchaseModel.findOne({_id:userInput.id});
-        const value = userInput.type ==='money'? userInput.value : purchaseRecord.price*(userInput.value+100)/100;
+        console.log(userInput.value,(userInput.value+100))
+        const value = userInput.type ==='money'? userInput.value : purchaseRecord.price*(parseFloat(userInput.value)+100)/100;
         const record = await this.notificationModel.create({
             user,
             coinId:purchaseRecord.coinId,
